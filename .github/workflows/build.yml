@@ -30,7 +30,6 @@ jobs:
         # choose the target to build for
         target:
           - esp32
-          - esp32c3
     runs-on: ubuntu-22.04
     container:
       image: espressif/idf:${{ matrix.idf-branch }}
@@ -55,7 +54,7 @@ jobs:
           path: |
                 build/bootloader/bootloader.bin
                 build/partition_table/partition-table.bin
-                build/*.bin
-                build/*.elf
+                build/project.bin
+                build/project.elf
                 build/flasher_args.json
           if-no-files-found: error
