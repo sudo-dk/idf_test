@@ -32,6 +32,7 @@ jobs:
       - name: Build firmware
         run: |
           source ~/esp-idf/export.sh
+           cd $GITHUB_WORKSPACE/blink_led  # Ensure the correct directory
           idf.py set-target esp32c3
           idf.py build
 
@@ -39,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: build/*.bin
+          path: blink_led/build/*.bin
 
   release:
     needs: build
