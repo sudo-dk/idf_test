@@ -46,15 +46,15 @@ jobs:
           git clone --recursive https://github.com/espressif/esp-idf.git ~/esp-idf
           cd ~/esp-idf
           ./install.sh
-          echo "source ~/esp-idf/export.sh" >> ~/.bashrc
      
-      - name: Set Up ESP-IDF
+      - name: Ensure ESP-IDF Python Virtual Environment Exists
         run: |
           source ~/esp-idf/export.sh
           python3 -m pip install --upgrade pip
           cd ~/esp-idf
           ./install.sh  # Ensures Python environment is set up
-          echo "source ~/esp-idf/export.sh" >> ~/.bashrc
+          source ~/esp-idf/export.sh
+          idf.py --version  # Verify ESP-IDF setup
      
       - name: Build firmware
         run: |
