@@ -7,7 +7,8 @@ on:
   pull_request:
     branches:
       - main
-
+  
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,27 +16,27 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          submodules: 'recursive'
+      - name: Data to header file conversion
+        run: |
+          python data2h.py data/index.html main/indexhtml.h
+          python data2h.py data/material-design-icons.ttf main/fontttf.h
+          python data2h.py data/material-design-icons.woff main/fontwoff.h
+          python data2h.py data/material-design-icons.svg main/fontsvg.h
+          python data2h.py data/material-design-icons.eot main/fonteot.h
+          python data2h.py data/cert.pem main/certpem.h
+          python data2h.py data/key.pem main/keypem.h
 
-      - name: Cache ESP-IDF
-        uses: actions/cache@v4
+      - name: esp-idf build
+        uses: espressif/esp-idf-ci-action@main
         with:
-          path: ~/.espressif
-          key: esp-idf-${{ runner.os }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: esp-idf-${{ runner.os }}-
+          esp_idf_version: v3.3.1
+          path: '.'
 
-      - name: Install ESP-IDF
-        run: |
-          git clone --recursive https://github.com/espressif/esp-idf.git ~/esp-idf
-          cd ~/esp-idf
-          ./install.sh
-          echo "source ~/esp-idf/export.sh" >> $GITHUB_ENV
-
-      - name: Build the Project
-        run: |
-          source ~/esp-idf/export.sh
-          idf.py build
+      - name: Store Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ufo-esp32.bin 
+          path: |
+            build/ufo-esp32.bin
