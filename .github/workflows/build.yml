@@ -28,6 +28,15 @@ jobs:
           restore-keys: |
             esp-idf-${{ runner.os }}-
 
+      - name: Cache ESP-IDF Python Environment
+        id: cache-python-env
+        uses: actions/cache@v3
+        with:
+          path: ~/.espressif
+          key: esp-idf-python-${{ runner.os }}-${{ hashFiles('~/esp-idf/requirements.txt') }}
+          restore-keys: |
+            esp-idf-python-${{ runner.os }}-
+
       - name: Install ESP-IDF (if not cached)
         if: steps.cache-esp-idf.outputs.cache-hit != 'true'
         run: |
