@@ -58,7 +58,3 @@ jobs:
           files: firmware/*.bin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            name: ufo-esp32.bin 
-          path: |
-            build/ufo-esp32.bin
