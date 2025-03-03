@@ -47,7 +47,15 @@ jobs:
           cd ~/esp-idf
           ./install.sh
           echo "source ~/esp-idf/export.sh" >> ~/.bashrc
-
+     
+      - name: Set Up ESP-IDF
+        run: |
+          source ~/esp-idf/export.sh
+          python3 -m pip install --upgrade pip
+          cd ~/esp-idf
+          ./install.sh  # Ensures Python environment is set up
+          echo "source ~/esp-idf/export.sh" >> ~/.bashrc
+     
       - name: Build firmware
         run: |
           source ~/esp-idf/export.sh
