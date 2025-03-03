@@ -7,36 +7,58 @@ on:
   pull_request:
     branches:
       - main
-  
-  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          submodules: 'recursive'
-      - name: Data to header file conversion
+          python-version: '3.10'
+
+      - name: Install ESP-IDF
         run: |
-          python data2h.py data/index.html main/indexhtml.h
-          python data2h.py data/material-design-icons.ttf main/fontttf.h
-          python data2h.py data/material-design-icons.woff main/fontwoff.h
-          python data2h.py data/material-design-icons.svg main/fontsvg.h
-          python data2h.py data/material-design-icons.eot main/fonteot.h
-          python data2h.py data/cert.pem main/certpem.h
-          python data2h.py data/key.pem main/keypem.h
+          sudo apt update
+          sudo apt install -y git wget flex bison gperf python3 python3-pip python3-venv \
+              ninja-build cmake ccache libffi-dev libssl-dev dfu-util
+          git clone --recursive https://github.com/espressif/esp-idf.git ~/esp-idf
+          cd ~/esp-idf
+          ./install.sh
+          echo "source ~/esp-idf/export.sh" >> ~/.bashrc
 
-      - name: esp-idf build
-        uses: espressif/esp-idf-ci-action@main
-        with:
-          esp_idf_version: v3.3.1
-          path: '.'
+      - name: Build firmware
+        run: |
+          source ~/esp-idf/export.sh
+          idf.py set-target esp32c3
+          idf.py build
 
-      - name: Store Artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ufo-esp32.bin 
+          name: firmware
+          path: build/*.bin
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'release:')
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware
+          path: firmware
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: firmware/*.bin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            name: ufo-esp32.bin 
           path: |
             build/ufo-esp32.bin
