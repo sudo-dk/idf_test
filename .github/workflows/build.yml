@@ -40,7 +40,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: blink_led/build/*.bin
+          path:         
+            blink_led/build/blink.bin
+            blink_led/build/bootloader/bootloader.bin
+            blink_led/build/partition_table/partition-table.bin
+
 
   release:
     needs: build
