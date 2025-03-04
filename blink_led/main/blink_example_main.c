@@ -90,7 +90,7 @@ static void configure_led(void)
 
 void app_main(void)
 {
-   ESP_LOGI("TEST","HELLO1234");
+   ESP_LOGI("TEST","HELLO12345");
     /* Configure the peripheral according to the LED type */
     configure_led();
 
